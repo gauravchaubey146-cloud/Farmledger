@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FarmLedger — Agricultural Farm Record Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --ink: #0B0C0E;
+  --ink2: #131417;
+  --ink3: #202226;
+  --gold: #5B7CFA;
+  --gold2: #8AA0FF;
+  --teal: #1E8F72;
+  --teal2: #2FB894;
+  --red: #C0392B;
+  --text: #F2F2F4;
+  --text2: #9C9CA6;
+  --text3: #5C5C66;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.16);
+  --r: 8px;
+  --r2: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--ink);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+::selection { background: var(--gold); color: var(--ink); }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%;
+  height: 64px;
+  background: rgba(11,12,14,0.88);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--gold); }
+.nav-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; letter-spacing: .12em;
+  padding: 3px 8px; border-radius: 99px;
+  background: var(--border); color: var(--gold);
+  border: 1px solid var(--border2);
+}
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a {
+  font-size: 13px; font-weight: 400; color: var(--text2);
+  text-decoration: none; transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  padding: 8px 20px; border-radius: var(--r);
+  background: var(--gold); color: #fff;
+  font-size: 13px; font-weight: 500;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: background .2s;
+}
+.nav-cta:hover { background: var(--gold2); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 5% 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 40%, transparent 100%);
+}
+.hero-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow-line { width: 32px; height: 1px; background: var(--gold); opacity: .5; }
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(38px, 6.4vw, 68px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  margin-bottom: 24px;
+  max-width: 820px;
+}
+.hero h1 em { font-style: normal; color: var(--gold); }
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: var(--text2); font-weight: 300;
+  max-width: 560px; line-height: 1.8;
+  margin-bottom: 48px;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.btn-gold {
+  padding: 14px 32px; border-radius: var(--r);
+  background: var(--gold); color: #fff;
+  font-size: 14px; font-weight: 500;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: background .2s, transform .15s;
+  display: inline-block;
+}
+.btn-gold:hover { background: var(--gold2); transform: translateY(-1px); }
+.btn-outline {
+  padding: 14px 32px; border-radius: var(--r);
+  background: transparent; color: var(--text);
+  font-size: 14px; font-weight: 400;
+  border: 1px solid var(--border2); cursor: pointer; text-decoration: none;
+  transition: border-color .2s, transform .15s;
+  display: inline-block;
+}
+.btn-outline:hover { border-color: var(--gold); transform: translateY(-1px); }
+.hero-stats {
+  display: flex; gap: 48px; margin-top: 72px;
+  padding-top: 40px; border-top: 1px solid var(--border);
+  flex-wrap: wrap; justify-content: center;
+}
+.stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px; font-weight: 700; color: var(--gold);
+}
+.stat-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ── SECTION BASE ── */
+section { padding: 100px 5%; position: relative; }
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(26px, 3.6vw, 44px);
+  font-weight: 600; line-height: 1.15;
+  letter-spacing: -.02em;
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 15px; color: var(--text2); font-weight: 300;
+  max-width: 520px; line-height: 1.8;
+}
+
+/* ── FEATURES ── */
+#features { background: var(--ink2); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  margin-top: 64px;
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  overflow: hidden;
+}
+.feat-card {
+  padding: 36px 32px;
+  background: var(--ink2);
+  transition: background .2s;
+}
+.feat-card:hover { background: var(--ink3); }
+.feat-icon {
+  width: 44px; height: 44px; border-radius: var(--r);
+  background: var(--border); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 20px;
+}
+.feat-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 600; margin-bottom: 10px;
+}
+.feat-desc { font-size: 13.5px; color: var(--text2); line-height: 1.7; }
+
+/* ── TOOLS SECTION ── */
+#tools { background: var(--ink); }
+.tools-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; flex-wrap: wrap; gap: 20px; }
+.tool-tabs { display: flex; gap: 4px; background: var(--ink2); border: 1px solid var(--border); border-radius: var(--r); padding: 4px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 8px 18px; border-radius: 7px; border: none;
+  background: transparent; color: var(--text2);
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.tab-btn.active { background: var(--gold); color: #fff; font-weight: 500; }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tool-panel { display: none; }
+.tool-panel.active { display: block; }
+
+.tool-frame { background: var(--ink2); border: 1px solid var(--border); border-radius: var(--r2); overflow: hidden; }
+.tool-topbar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--ink3); }
+.tool-dots { display: flex; gap: 6px; }
+.tool-dot { width: 10px; height: 10px; border-radius: 50%; }
+.tool-body { padding: 24px; }
+
+/* forms */
+.f-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; margin-bottom: 20px; }
+.f-ctitle { font-size: 10.5px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px; }
+.f-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.f-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.f-field { display: flex; flex-direction: column; gap: 5px; }
+.f-field label { font-size: 12px; color: var(--text2); }
+.f-field input, .f-field select { width: 100%; padding: 9px 11px; font-size: 13px; font-family: inherit; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,0.04); color: var(--text); outline: none; }
+.f-field input:focus, .f-field select:focus { border-color: var(--gold); }
+.f-field select option { background: var(--ink3); }
+.f-gap { margin-top: 12px; }
+.f-submit { width: 100%; margin-top: 14px; padding: 11px; font-size: 13.5px; font-weight: 500; font-family: inherit; border: 1px solid rgba(91,124,250,0.35); border-radius: var(--r); background: rgba(91,124,250,0.14); color: var(--gold2); cursor: pointer; transition: background .15s; }
+.f-submit:hover { background: rgba(91,124,250,0.24); }
+.f-error { color: #e8756a; font-size: 12.5px; margin-top: 10px; display: none; }
+
+/* tables */
+.t-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; }
+thead th { text-align: left; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); padding: 12px 14px; background: rgba(91,124,250,0.07); border-bottom: 1px solid var(--border); font-weight: 500; }
+tbody td { padding: 12px 14px; font-size: 13.5px; border-bottom: 1px solid var(--border); color: var(--text); }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+td.num, th.num { font-family: 'IBM Plex Mono', monospace; }
+.empty-row td { text-align: center; padding: 30px 14px; color: var(--text3); font-size: 13px; font-style: italic; }
+.del-btn { background: none; border: 1px solid var(--border2); color: #e8756a; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+.del-btn:hover { background: rgba(192,57,43,0.12); border-color: rgba(231,76,60,0.4); }
+
+.stamp { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; border: 1px solid; }
+.stamp.growing { color: var(--teal2); border-color: rgba(59,160,143,0.4); background: rgba(45,125,111,0.12); }
+.stamp.harvested { color: var(--gold2); border-color: rgba(91,124,250,0.4); background: rgba(91,124,250,0.12); }
+
+/* report */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 14px; margin-bottom: 20px; }
+.stat-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; }
+.stat-card .label { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+.stat-card .value { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 500; color: var(--text); }
+
+.ledger { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--r); padding: 22px 24px; }
+.l-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px dashed var(--border); font-size: 14px; color: var(--text2); }
+.l-row:last-child { border-bottom: none; }
+.l-row .amt { font-family: 'IBM Plex Mono', monospace; color: var(--text); }
+.l-row.total { border-top: 1px solid var(--border2); margin-top: 6px; padding-top: 14px; font-weight: 500; font-size: 16px; color: var(--text); }
+.l-row.total.profit .amt { color: var(--teal2); }
+.l-row.total.loss .amt { color: #e8756a; }
+
+.bar-wrap { margin-top: 24px; }
+.bar-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; }
+.bar-track { height: 10px; border-radius: 5px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); overflow: hidden; margin-bottom: 16px; }
+.bar-fill { height: 100%; border-radius: 5px 0 0 5px; transition: width .4s; }
+.bar-fill.revenue { background: var(--teal2); }
+.bar-fill.cost { background: #e8756a; }
+
+/* ── HOW IT WORKS ── */
+#how { background: var(--ink2); }
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; margin-top: 64px; background: var(--border); border-radius: var(--r2); overflow: hidden; }
+.how-step { background: var(--ink2); padding: 40px 28px; position: relative; }
+.how-num { font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700; color: rgba(91,124,250,0.14); line-height: 1; margin-bottom: 20px; }
+.how-title { font-size: 16px; font-weight: 500; margin-bottom: 10px; }
+.how-desc { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* ── ABOUT / TRUST ── */
+#about { background: var(--ink); }
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 48px; }
+.about-card { padding: 24px; border-radius: var(--r); background: rgba(255,255,255,0.02); border: 1px solid var(--border); transition: border-color .2s; }
+.about-card:hover { border-color: var(--border2); }
+.about-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); margin-bottom: 10px; }
+.about-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.about-desc { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+
+/* ── CTA ── */
+#cta { background: var(--ink2); text-align: center; padding: 120px 5%; }
+.cta-inner { max-width: 640px; margin: 0 auto; }
+.cta-inner .section-title { font-size: clamp(28px, 4vw, 48px); }
+.cta-inner .section-sub { margin: 0 auto 40px; }
+
+/* ── FOOTER ── */
+footer { background: var(--ink); border-top: 1px solid var(--border); padding: 48px 5% 32px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+.footer-brand p { font-size: 13px; color: var(--text3); margin-top: 12px; line-height: 1.7; max-width: 260px; }
+.footer-col h4 { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 14px; }
+.footer-col a { display: block; font-size: 13px; color: var(--text3); text-decoration: none; margin-bottom: 8px; transition: color .2s; }
+.footer-col a:hover { color: var(--text); }
+.footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text3); flex-wrap: wrap; gap: 12px; }
+.footer-legal { display: flex; gap: 20px; }
+.footer-legal a { color: var(--text3); text-decoration: none; }
+.footer-legal a:hover { color: var(--text); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeup { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+.fadeup { animation: fadeup .7s ease both; }
+.d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; } .d3 { animation-delay: .3s; } .d4 { animation-delay: .4s; }
+@media (prefers-reduced-motion: reduce) { *{ animation: none !important; transition: none !important; } }
+
+@media (max-width: 768px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .f-grid4, .f-grid2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span>Farm</span>Ledger <span class="nav-badge">LOCAL</span></a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#tools">Tools</a>
+    <a href="#how">How it works</a>
+    <a href="#about">About</a>
+  </div>
+  <a class="nav-cta" href="#tools">Open Ledger</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow fadeup"><span class="eyebrow-line"></span>Farm Record Management System<span class="eyebrow-line"></span></div>
+  <h1 class="fadeup d1">Every crop, cost, and harvest — <em>tracked</em> in one place</h1>
+  <p class="hero-sub fadeup d2">FarmLedger replaces scattered notebooks with one organised ledger for your farm — crops, expenses, harvests, and profit, always saved automatically.</p>
+  <div class="hero-btns fadeup d3">
+    <a class="btn-gold" href="#tools">Open the ledger</a>
+    <a class="btn-outline" href="#how">How it works</a>
+  </div>
+  <div class="hero-stats fadeup d4">
+    <div><div class="stat-num">4</div><div class="stat-label">Record modules</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-label">Saved automatically</div></div>
+    <div><div class="stat-num">0</div><div class="stat-label">Setup required</div></div>
+    <div><div class="stat-num">₹</div><div class="stat-label">Auto profit &amp; loss</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Capabilities</div>
+  <div class="section-title">Everything your farm's<br />paperwork needs</div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🌾</div>
+      <div class="feat-name">Crop records</div>
+      <div class="feat-desc">Log every crop by field, area, and cost. Each one tracks its own status from planting to harvest.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💵</div>
+      <div class="feat-name">Expense tracking</div>
+      <div class="feat-desc">Record fertiliser, labour, equipment, and every other cost outside the crop itself.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🚜</div>
+      <div class="feat-name">Harvest &amp; revenue</div>
+      <div class="feat-desc">Enter quantity and rate at sale time — revenue is calculated for you, instantly.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-name">Profit &amp; loss report</div>
+      <div class="feat-desc">Every record rolls up into one live report: total revenue, total cost, and net profit or loss.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏷️</div>
+      <div class="feat-name">Status at a glance</div>
+      <div class="feat-desc">Clear Growing / Harvested badges on every crop, so nothing gets double-counted or forgotten.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💾</div>
+      <div class="feat-name">Saved automatically</div>
+      <div class="feat-desc">No login, no server, no lost data. Everything is saved in your browser the moment you add it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="tools-header">
+    <div>
+      <div class="section-label">Live tools</div>
+      <div class="section-title" style="margin-bottom:0">Try it right now</div>
+    </div>
+    <div class="tool-tabs">
+      <button class="tab-btn active" onclick="switchTab('report')">📊 Report</button>
+      <button class="tab-btn" onclick="switchTab('crops')">🌾 Crops</button>
+      <button class="tab-btn" onclick="switchTab('expenses')">💵 Expenses</button>
+      <button class="tab-btn" onclick="switchTab('harvests')">🚜 Harvests</button>
+    </div>
+  </div>
+
+  <!-- REPORT PANEL -->
+  <div class="tool-panel active" id="panel-report">
+    <div class="tool-frame">
+      <div class="tool-topbar">
+        <div class="tool-dots"><div class="tool-dot" style="background:#C0392B"></div><div class="tool-dot" style="background:#5B7CFA"></div><div class="tool-dot" style="background:#2D7D6F"></div></div>
+        <span style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace">farmledger — season report</span>
+        <span style="font-size:11px;color:#2FB894">● saved locally</span>
+      </div>
+      <div class="tool-body">
+        <div class="cards">
+          <div class="stat-card"><div class="label">Total crops</div><div class="value" id="stat-crops">0</div></div>
+          <div class="stat-card"><div class="label">Total harvests</div><div class="value" id="stat-harvests">0</div></div>
+          <div class="stat-card"><div class="label">Total expenses</div><div class="value" id="stat-expenses">0</div></div>
+        </div>
+        <div class="ledger">
+          <div class="l-row"><span>Total revenue</span><span class="amt" id="sum-revenue">₹0.00</span></div>
+          <div class="l-row"><span>Crop cost</span><span class="amt" id="sum-cropcost">₹0.00</span></div>
+          <div class="l-row"><span>Other expenses</span><span class="amt" id="sum-otherexp">₹0.00</span></div>
+          <div class="l-row"><span>Total cost</span><span class="amt" id="sum-totalcost">₹0.00</span></div>
+          <div class="l-row total" id="sum-profit-row"><span id="sum-profit-label">Net profit</span><span class="amt" id="sum-profit">₹0.00</span></div>
+          <div class="bar-wrap">
+            <div class="bar-label"><span>Revenue</span><span id="bar-rev-label">₹0.00</span></div>
+            <div class="bar-track"><div class="bar-fill revenue" id="bar-rev" style="width:0%"></div></div>
+            <div class="bar-label"><span>Total cost</span><span id="bar-cost-label">₹0.00</span></div>
+            <div class="bar-track"><div class="bar-fill cost" id="bar-cost" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROPS PANEL -->
+  <div class="tool-panel" id="panel-crops">
+    <div class="tool-frame">
+      <div class="tool-topbar">
+        <div class="tool-dots"><div class="tool-dot" style="background:#C0392B"></div><div class="tool-dot" style="background:#5B7CFA"></div><div class="tool-dot" style="background:#2D7D6F"></div></div>
+        <span style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace">farmledger — crop records</span>
+        <span style="font-size:11px;color:#2FB894">● saved locally</span>
+      </div>
+      <div class="tool-body">
+        <div class="f-card">
+          <div class="f-ctitle">Add a crop</div>
+          <form id="cropForm">
+            <div class="f-grid4">
+              <div class="f-field"><label>Crop name</label><input id="cropName" required maxlength="19" placeholder="e.g. Wheat" /></div>
+              <div class="f-field"><label>Field</label><input id="cropFieldInput" required maxlength="19" placeholder="e.g. North Field" /></div>
+              <div class="f-field"><label>Area (acres)</label><input id="cropArea" type="number" min="0.01" step="0.01" required placeholder="0.0" /></div>
+              <div class="f-field"><label>Cost (₹)</label><input id="cropCost" type="number" min="0" step="0.01" required placeholder="0.00" /></div>
+            </div>
+            <button type="submit" class="f-submit">Add crop</button>
+            <div class="f-error" id="cropError">Please fill every field with a valid, positive value.</div>
+          </form>
+        </div>
+        <div class="t-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Field</th><th class="num">Area</th><th class="num">Cost</th><th>Status</th><th></th></tr></thead>
+            <tbody id="cropTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPENSES PANEL -->
+  <div class="tool-panel" id="panel-expenses">
+    <div class="tool-frame">
+      <div class="tool-topbar">
+        <div class="tool-dots"><div class="tool-dot" style="background:#C0392B"></div><div class="tool-dot" style="background:#5B7CFA"></div><div class="tool-dot" style="background:#2D7D6F"></div></div>
+        <span style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace">farmledger — expenses</span>
+        <span style="font-size:11px;color:#2FB894">● saved locally</span>
+      </div>
+      <div class="tool-body">
+        <div class="f-card">
+          <div class="f-ctitle">Add an expense</div>
+          <form id="expenseForm">
+            <div class="f-grid2">
+              <div class="f-field"><label>Expense name</label><input id="expName" required maxlength="19" placeholder="e.g. Fertilizer" /></div>
+              <div class="f-field"><label>Amount (₹)</label><input id="expAmount" type="number" min="0.01" step="0.01" required placeholder="0.00" /></div>
+            </div>
+            <button type="submit" class="f-submit">Add expense</button>
+            <div class="f-error" id="expError">Please fill every field with a valid, positive value.</div>
+          </form>
+        </div>
+        <div class="t-wrap">
+          <table>
+            <thead><tr><th>Name</th><th class="num">Amount</th><th></th></tr></thead>
+            <tbody id="expTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HARVESTS PANEL -->
+  <div class="tool-panel" id="panel-harvests">
+    <div class="tool-frame">
+      <div class="tool-topbar">
+        <div class="tool-dots"><div class="tool-dot" style="background:#C0392B"></div><div class="tool-dot" style="background:#5B7CFA"></div><div class="tool-dot" style="background:#2D7D6F"></div></div>
+        <span style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace">farmledger — harvests</span>
+        <span style="font-size:11px;color:#2FB894">● saved locally</span>
+      </div>
+      <div class="tool-body">
+        <div class="f-card">
+          <div class="f-ctitle">Record a harvest</div>
+          <form id="harvestForm">
+            <div class="f-grid4">
+              <div class="f-field"><label>Crop</label><select id="harCrop" required></select></div>
+              <div class="f-field"><label>Quantity</label><input id="harQty" type="number" min="0.01" step="0.01" required placeholder="0.0" /></div>
+              <div class="f-field"><label>Rate (₹ / unit)</label><input id="harRate" type="number" min="0.01" step="0.01" required placeholder="0.00" /></div>
+              <div style="display:flex; align-items:flex-end;"><button type="submit" class="f-submit" style="margin-top:0">Record harvest</button></div>
+            </div>
+            <div class="f-error" id="harError">Select a crop and enter valid, positive values.</div>
+          </form>
+        </div>
+        <div class="t-wrap">
+          <table>
+            <thead><tr><th>Crop</th><th class="num">Quantity</th><th class="num">Rate</th><th class="num">Revenue</th><th></th></tr></thead>
+            <tbody id="harTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">Process</div>
+  <div class="section-title">How FarmLedger works</div>
+  <div class="how-grid">
+    <div class="how-step"><div class="how-num">01</div><div class="how-title">Add a crop</div><div class="how-desc">Log the field, area, and cost the moment you plant. It starts life as "Growing".</div></div>
+    <div class="how-step"><div class="how-num">02</div><div class="how-title">Log expenses</div><div class="how-desc">Record fertiliser, labour, and other costs as they happen through the season.</div></div>
+    <div class="how-step"><div class="how-num">03</div><div class="how-title">Record the harvest</div><div class="how-desc">Enter quantity and rate at sale time. Revenue is calculated and the crop flips to "Harvested".</div></div>
+    <div class="how-step"><div class="how-num">04</div><div class="how-title">Read the report</div><div class="how-desc">Every record rolls up automatically into one profit-or-loss summary for the season.</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Good to know</div>
+  <div class="section-title">Built to be simple</div>
+  <p class="section-sub">No account, no server, no learning curve — just an organised ledger that stays out of your way.</p>
+  <div class="about-grid">
+    <div class="about-card"><div class="about-tag">NO LOGIN</div><div class="about-title">Open and start</div><div class="about-desc">There's nothing to sign up for. Open the page and start adding records straight away.</div></div>
+    <div class="about-card"><div class="about-tag">LOCAL-FIRST</div><div class="about-title">Your data stays with you</div><div class="about-desc">Every record is saved in your own browser — nothing is sent to a server.</div></div>
+    <div class="about-card"><div class="about-tag">ALWAYS SAVED</div><div class="about-title">Nothing gets lost</div><div class="about-desc">Close the tab, restart your device, come back next season — your records are still there.</div></div>
+    <div class="about-card"><div class="about-tag">ANY DEVICE</div><div class="about-title">Works on desktop &amp; mobile</div><div class="about-desc">The layout adapts to your screen, whether you're at a desk or in the field.</div></div>
+    <div class="about-card"><div class="about-tag">UNLIMITED</div><div class="about-title">No record limits</div><div class="about-desc">Add as many crops, expenses, and harvests as your season needs.</div></div>
+    <div class="about-card"><div class="about-tag">AUTOMATIC</div><div class="about-title">Profit &amp; loss, calculated</div><div class="about-desc">The report tab does the maths — revenue, cost, and net result — the moment you add a record.</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-inner">
+    <div class="section-label" style="text-align:center">Get started</div>
+    <div class="section-title">Your farm's records, organised today</div>
+    <p class="section-sub">No installation, no setup — just open the ledger and add your first crop.</p>
+    <div class="hero-btns">
+      <a class="btn-gold" href="#tools">Open the ledger</a>
+      <a class="btn-outline" href="#features">See all features</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="nav-logo" style="text-decoration:none;display:inline-flex"><span style="color:var(--gold)">Farm</span>Ledger</div>
+      <p>A simple, always-saved record system for crops, expenses, harvests, and profit — built for the farm, not a server room.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Tools</h4>
+      <a href="#tools">Crop records</a>
+      <a href="#tools">Expenses</a>
+      <a href="#tools">Harvests</a>
+      <a href="#tools">Report</a>
+    </div>
+    <div class="footer-col">
+      <h4>Learn</h4>
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#about">About</a>
+    </div>
+    <div class="footer-col">
+      <h4>Project</h4>
+      <a href="#">College project</a>
+      <a href="#">Built with HTML/CSS/JS</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 FarmLedger. Agricultural Farm Record Management System.</span>
+    <div class="footer-legal"><a href="#">Data stays in your browser</a></div>
+  </div>
+</footer>
+
+<script>
+/* ── TAB SWITCHER ── */
+function switchTab(t){
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   FARM DATA — saved to localStorage
+══════════════════════════════════════ */
+(function(){
+  const STORAGE_KEY = "farmLedgerData_v2";
+
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { crops:[], expenses:[], harvests:[], nextId:1 };
+      const p = JSON.parse(raw);
+      return { crops:p.crops||[], expenses:p.expenses||[], harvests:p.harvests||[], nextId:p.nextId||1 };
+    }catch(e){ console.error("Could not read saved data.", e); return { crops:[], expenses:[], harvests:[], nextId:1 }; }
+  }
+  function saveData(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch(e){ console.error("Could not save data.", e); alert("Your changes could not be saved (browser storage may be full or disabled)."); }
+  }
+  let data = loadData();
+
+  function fmt(n){ return "₹" + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  function renderCrops(){
+    const tbody = document.getElementById('cropTableBody');
+    if(data.crops.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No crops recorded yet — add your first one above.</td></tr>';
+    }else{
+      tbody.innerHTML = data.crops.map(c => `
+        <tr>
+          <td>${esc(c.name)}</td><td>${esc(c.field)}</td>
+          <td class="num">${c.area.toFixed(1)}</td><td class="num">${fmt(c.cost)}</td>
+          <td><span class="stamp ${c.status==='Harvested'?'harvested':'growing'}">${c.status}</span></td>
+          <td><button class="del-btn" data-id="${c.id}">Delete</button></td>
+        </tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      const id = Number(b.dataset.id);
+      const crop = data.crops.find(c=>c.id===id);
+      if(crop && crop.status==='Harvested'){
+        if(!confirm("This crop has a linked harvest record. Deleting it will also remove that harvest. Continue?")) return;
+        data.harvests = data.harvests.filter(h=>h.cropId!==id);
+      }
+      data.crops = data.crops.filter(c=>c.id!==id);
+      saveData(); renderAll();
+    }));
+  }
+
+  function renderExpenses(){
+    const tbody = document.getElementById('expTableBody');
+    if(data.expenses.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No expenses recorded yet — add your first one above.</td></tr>';
+    }else{
+      tbody.innerHTML = data.expenses.map(e => `
+        <tr><td>${esc(e.name)}</td><td class="num">${fmt(e.amount)}</td>
+        <td><button class="del-btn" data-id="${e.id}">Delete</button></td></tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      data.expenses = data.expenses.filter(e=>e.id!==Number(b.dataset.id));
+      saveData(); renderAll();
+    }));
+  }
+
+  function renderHarvestCropOptions(){
+    const sel = document.getElementById('harCrop');
+    const growing = data.crops.filter(c=>c.status!=='Harvested');
+    if(growing.length === 0){
+      sel.innerHTML = '<option value="">No growing crops available</option>';
+      sel.disabled = true;
+    }else{
+      sel.disabled = false;
+      sel.innerHTML = growing.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.field)}</option>`).join('');
+    }
+  }
+  function renderHarvests(){
+    const tbody = document.getElementById('harTableBody');
+    if(data.harvests.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No harvests recorded yet.</td></tr>';
+    }else{
+      tbody.innerHTML = data.harvests.map(h => `
+        <tr><td>${esc(h.cropName)}</td><td class="num">${h.qty.toFixed(1)}</td>
+        <td class="num">${fmt(h.rate)}</td><td class="num">${fmt(h.revenue)}</td>
+        <td><button class="del-btn" data-id="${h.id}">Delete</button></td></tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      const id = Number(b.dataset.id);
+      const h = data.harvests.find(x=>x.id===id);
+      if(h){ const crop = data.crops.find(c=>c.id===h.cropId); if(crop) crop.status='Growing'; }
+      data.harvests = data.harvests.filter(x=>x.id!==id);
+      saveData(); renderAll();
+    }));
+    renderHarvestCropOptions();
+  }
+
+  function renderReport(){
+    document.getElementById('stat-crops').textContent = data.crops.length;
+    document.getElementById('stat-harvests').textContent = data.harvests.length;
+    document.getElementById('stat-expenses').textContent = data.expenses.length;
+    const revenue = data.harvests.reduce((s,h)=>s+h.revenue,0);
+    const cropCost = data.crops.reduce((s,c)=>s+c.cost,0);
+    const otherExp = data.expenses.reduce((s,e)=>s+e.amount,0);
+    const totalCost = cropCost + otherExp;
+    const profit = revenue - totalCost;
+    document.getElementById('sum-revenue').textContent = fmt(revenue);
+    document.getElementById('sum-cropcost').textContent = fmt(cropCost);
+    document.getElementById('sum-otherexp').textContent = fmt(otherExp);
+    document.getElementById('sum-totalcost').textContent = fmt(totalCost);
+    const row = document.getElementById('sum-profit-row');
+    const label = document.getElementById('sum-profit-label');
+    const val = document.getElementById('sum-profit');
+    row.classList.remove('profit','loss');
+    if(profit >= 0){ row.classList.add('profit'); label.textContent='Net profit'; val.textContent=fmt(profit); }
+    else { row.classList.add('loss'); label.textContent='Net loss'; val.textContent=fmt(Math.abs(profit)); }
+    const maxVal = Math.max(revenue, totalCost, 1);
+    document.getElementById('bar-rev').style.width = (revenue/maxVal*100)+'%';
+    document.getElementById('bar-cost').style.width = (totalCost/maxVal*100)+'%';
+    document.getElementById('bar-rev-label').textContent = fmt(revenue);
+    document.getElementById('bar-cost-label').textContent = fmt(totalCost);
+  }
+
+  function renderAll(){ renderCrops(); renderExpenses(); renderHarvests(); renderReport(); }
+
+  document.getElementById('cropForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('cropName').value.trim();
+    const field = document.getElementById('cropFieldInput').value.trim();
+    const area = parseFloat(document.getElementById('cropArea').value);
+    const cost = parseFloat(document.getElementById('cropCost').value);
+    const err = document.getElementById('cropError');
+    if(!name || !field || !(area>0) || !(cost>=0) || isNaN(area) || isNaN(cost)){ err.style.display='block'; return; }
+    err.style.display='none';
+    data.crops.push({ id:data.nextId++, name, field, area, cost, status:'Growing' });
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  document.getElementById('expenseForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('expName').value.trim();
+    const amount = parseFloat(document.getElementById('expAmount').value);
+    const err = document.getElementById('expError');
+    if(!name || !(amount>0) || isNaN(amount)){ err.style.display='block'; return; }
+    err.style.display='none';
+    data.expenses.push({ id:data.nextId++, name, amount });
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  document.getElementById('harvestForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const cropId = Number(document.getElementById('harCrop').value);
+    const qty = parseFloat(document.getElementById('harQty').value);
+    const rate = parseFloat(document.getElementById('harRate').value);
+    const err = document.getElementById('harError');
+    const crop = data.crops.find(c=>c.id===cropId);
+    if(!crop || !(qty>0) || !(rate>0) || isNaN(qty) || isNaN(rate)){ err.style.display='block'; return; }
+    err.style.display='none';
+    const revenue = qty*rate;
+    data.harvests.push({ id:data.nextId++, cropId:crop.id, cropName:crop.name, qty, rate, revenue });
+    crop.status = 'Harvested';
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

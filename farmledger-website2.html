@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#183b2b" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%233f7458' d='M8 51C10 22 26 8 56 8 54 39 38 54 8 51Z'/%3E%3Cpath fill='none' stroke='%23d6e589' stroke-width='5' stroke-linecap='round' d='M15 45C26 34 35 27 49 17'/%3E%3C/svg%3E" />
+<title>FarmLedger — Your season, clearly tracked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+
+:root {
+  --forest: #183b2b;
+  --forest-deep: #102b20;
+  --forest-soft: #e5f0e7;
+  --leaf: #3f7458;
+  --leaf-2: #5f9270;
+  --lime: #d6e589;
+  --clay: #d36c43;
+  --sun: #efa94a;
+  --ink: #1f2922;
+  --text: #263129;
+  --muted: #66736a;
+  --muted-2: #879188;
+  --paper: #fbfaf6;
+  --cream: #f3f0e8;
+  --line: #dfe3da;
+  --white: #ffffff;
+  --danger: #b44936;
+  --shadow: 0 22px 55px rgba(31, 52, 40, .12);
+  --shadow-sm: 0 8px 24px rgba(31, 52, 40, .08);
+  --r: 14px;
+  --r-lg: 26px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', Arial, sans-serif; background: var(--paper); color: var(--text); line-height: 1.55; overflow-x: hidden; }
+body.menu-open { overflow: hidden; }
+::selection { background: var(--lime); color: var(--forest-deep); }
+a { color: inherit; }
+button, input, select { font: inherit; }
+
+/* Navigation */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(5%, calc((100vw - 1220px) / 2)); background: rgba(251,250,246,.88); border-bottom: 1px solid rgba(44,72,55,.08); backdrop-filter: blur(18px); }
+.nav-logo { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -.055em; }
+.nav-logo::before { content: ''; width: 25px; height: 25px; margin-right: 9px; border-radius: 8px 2px 8px 2px; background: linear-gradient(135deg, var(--leaf) 0 48%, var(--lime) 49% 100%); transform: rotate(-9deg); box-shadow: inset 0 0 0 1px rgba(18,58,39,.12); }
+.nav-logo span { color: var(--leaf); }
+.nav-badge { margin-left: 9px; padding: 4px 7px; border-radius: 99px; background: #eef4dc; color: #526b25 !important; font: 600 9px/1 'IBM Plex Mono', monospace; letter-spacing: .1em; }
+.nav-links { display: flex; align-items: center; gap: 30px; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 550; transition: color .2s; }
+.nav-links a:hover { color: var(--forest); }
+.nav-cta, .btn-gold { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 18px; border-radius: 11px; border: 1px solid var(--forest); background: var(--forest); color: var(--white); font-size: 13px; font-weight: 650; text-decoration: none; box-shadow: 0 6px 14px rgba(19,57,40,.15); transition: transform .2s, background .2s, box-shadow .2s; }
+.nav-cta:hover, .btn-gold:hover { background: #28513c; transform: translateY(-2px); box-shadow: 0 10px 18px rgba(19,57,40,.19); }
+.menu-toggle { display: none; border: 0; padding: 8px; background: transparent; color: var(--forest); cursor: pointer; }
+.menu-toggle svg { display: block; }
+
+/* Shared */
+section { position: relative; padding: 112px max(5%, calc((100vw - 1220px) / 2)); }
+.section-label { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--leaf); font: 700 10px/1.2 'IBM Plex Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+.section-label::before { content: ''; width: 18px; height: 2px; border-radius: 4px; background: var(--sun); }
+.section-title { max-width: 650px; color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: clamp(34px, 4.2vw, 55px); font-weight: 650; letter-spacing: -.055em; line-height: 1.05; }
+.section-sub { max-width: 530px; margin-top: 18px; color: var(--muted); font-size: 16px; line-height: 1.75; }
+
+/* Hero */
+.hero { min-height: 760px; display: grid; grid-template-columns: minmax(0, 1.03fr) minmax(430px, .97fr); align-items: center; gap: clamp(36px, 7vw, 110px); padding-top: 138px; padding-bottom: 82px; overflow: hidden; background: radial-gradient(circle at 91% 19%, rgba(203,224,155,.52), transparent 24%), radial-gradient(circle at 11% 89%, rgba(224,173,91,.18), transparent 24%), var(--paper); }
+.hero::before { content: ''; position: absolute; z-index: 0; width: 760px; height: 760px; right: -285px; top: 2px; border: 1px solid rgba(64,116,88,.11); border-radius: 50%; box-shadow: 0 0 0 48px rgba(64,116,88,.035), 0 0 0 96px rgba(64,116,88,.025), 0 0 0 144px rgba(64,116,88,.018); }
+.hero::after { content: ''; position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 1px; background: var(--line); }
+.hero-grid { position: absolute; inset: 0; z-index: 0; opacity: .55; background-image: linear-gradient(rgba(51,91,64,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(51,91,64,.05) 1px, transparent 1px); background-size: 64px 64px; mask-image: linear-gradient(to bottom, black, transparent 78%); }
+.hero-copy, .hero-visual { position: relative; z-index: 1; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 25px; padding: 8px 12px; border: 1px solid rgba(61,116,81,.16); border-radius: 999px; background: rgba(255,255,255,.66); color: var(--leaf); font: 600 10px/1 'IBM Plex Mono', monospace; letter-spacing: .11em; text-transform: uppercase; box-shadow: 0 3px 12px rgba(26,56,37,.04); }
+.eyebrow-line { width: 6px; height: 6px; border-radius: 50%; background: var(--sun); }
+.hero h1 { max-width: 610px; color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 5.25vw, 73px); font-weight: 650; letter-spacing: -.071em; line-height: .99; }
+.hero h1 em { color: var(--leaf); font-style: normal; }
+.hero-sub { max-width: 550px; margin: 25px 0 32px; color: var(--muted); font-size: 17px; line-height: 1.72; }
+.hero-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn-gold { padding: 15px 21px; font-size: 14px; }
+.btn-gold::after { content: '→'; font-size: 17px; line-height: 12px; transition: transform .2s; }
+.btn-gold:hover::after { transform: translateX(3px); }
+.btn-outline { display: inline-flex; align-items: center; justify-content: center; padding: 14px 21px; border: 1px solid #ccd6cb; border-radius: 11px; background: rgba(255,255,255,.65); color: var(--forest); font-size: 14px; font-weight: 650; text-decoration: none; transition: transform .2s, border .2s, background .2s; }
+.btn-outline:hover { border-color: var(--leaf); background: var(--white); transform: translateY(-2px); }
+.hero-stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4,1fr); gap: 0; margin-top: 6px; border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.62); overflow: hidden; box-shadow: 0 10px 34px rgba(35,59,44,.05); }
+.hero-stats > div { padding: 19px 23px; border-right: 1px solid var(--line); }
+.hero-stats > div:last-child { border: 0; }
+.stat-num { color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 650; letter-spacing: -.05em; line-height: 1.1; }
+.stat-label { margin-top: 5px; color: var(--muted); font-size: 11.5px; font-weight: 500; }
+
+/* Hero dashboard visual */
+.hero-visual { min-height: 462px; display: flex; align-items: center; justify-content: center; }
+.leaf-orbit { position: absolute; width: 452px; height: 452px; border-radius: 50%; border: 1px solid rgba(58,109,78,.13); }
+.leaf-orbit::before, .leaf-orbit::after { content: ''; position: absolute; border-radius: 62% 38% 61% 39%; background: #d3e4ae; opacity: .8; }
+.leaf-orbit::before { width: 66px; height: 31px; left: 4px; top: 92px; transform: rotate(-25deg); }
+.leaf-orbit::after { width: 39px; height: 68px; right: 29px; bottom: 71px; transform: rotate(42deg); }
+.dashboard-card { position: relative; z-index: 2; width: min(100%, 460px); padding: 22px; border: 1px solid rgba(255,255,255,.64); border-radius: 22px; background: rgba(254,254,250,.78); box-shadow: 0 32px 56px rgba(31,75,47,.16), 0 3px 0 rgba(255,255,255,.55) inset; backdrop-filter: blur(12px); transform: rotate(2.5deg); }
+.dashboard-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.dashboard-brand { display: flex; align-items: center; gap: 9px; color: var(--forest); font: 650 14px 'Space Grotesk', sans-serif; }
+.dashboard-brand i { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 8px; background: var(--forest); color: var(--lime); font-style: normal; font-size: 14px; }
+.live-pill { padding: 5px 8px; border-radius: 99px; background: #edf5e8; color: #47733d; font: 600 9px/1 'IBM Plex Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
+.live-pill::before { content: '●'; margin-right: 4px; color: #70a549; }
+.season-card { display: flex; align-items: end; justify-content: space-between; gap: 14px; min-height: 159px; margin-top: 17px; padding: 21px; overflow: hidden; border-radius: 16px; background: linear-gradient(135deg, #1d5039, #306548); color: white; position: relative; }
+.season-card::after { content: ''; position: absolute; right: -20px; top: -78px; width: 210px; height: 210px; border: 36px solid rgba(218,232,151,.17); border-radius: 54% 46% 58% 42%; transform: rotate(-22deg); }
+.season-label { position: relative; z-index: 1; color: #d9e9bf; font: 600 9px 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+.season-card strong { position: relative; z-index: 1; display: block; margin-top: 8px; max-width: 200px; font: 600 28px/1.05 'Space Grotesk', sans-serif; letter-spacing: -.05em; }
+.season-value { position: relative; z-index: 1; padding: 7px 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(0,0,0,.12); color: #eff5d8; font: 600 10px 'IBM Plex Mono', monospace; white-space: nowrap; }
+.visual-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 11px; }
+.visual-metric { padding: 14px 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.76); }
+.visual-metric span { display: block; color: var(--muted); font-size: 10px; font-weight: 550; }
+.visual-metric strong { display: block; margin-top: 4px; color: var(--forest); font: 650 19px/1 'Space Grotesk', sans-serif; letter-spacing: -.05em; }
+.visual-note { display: flex; align-items: center; gap: 9px; margin-top: 12px; color: var(--muted); font-size: 11px; }
+.visual-note b { display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: #edf3d8; color: #6b813b; font-size: 11px; }
+
+/* Features */
+#features { background: var(--cream); }
+.features-intro { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 32px; }
+.feature-kicker { max-width: 270px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 52px; }
+.feat-card { min-height: 228px; padding: 27px; border: 1px solid #e1e3db; border-radius: 16px; background: rgba(255,255,255,.8); box-shadow: 0 3px 0 rgba(53,78,61,.015); transition: transform .25s, box-shadow .25s, border-color .25s; }
+.feat-card:hover { border-color: #c4d2bd; box-shadow: var(--shadow-sm); transform: translateY(-5px); }
+.feat-icon { display: grid; width: 45px; height: 45px; place-items: center; margin-bottom: 21px; border-radius: 12px; background: var(--forest-soft); color: var(--leaf); }
+.feat-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.feat-name { color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 650; letter-spacing: -.035em; }
+.feat-desc { margin-top: 8px; color: var(--muted); font-size: 13.5px; line-height: 1.65; }
+
+/* Workspace */
+#tools { color: #f9fcf8; background: var(--forest); overflow: hidden; }
+#tools::before { content: ''; position: absolute; width: 620px; height: 620px; top: -330px; right: -145px; border-radius: 50%; background: rgba(207,229,137,.11); filter: blur(1px); }
+#tools .section-label { color: #d6e589; }
+#tools .section-label::before { background: var(--sun); }
+#tools .section-title { color: #fff; }
+.tools-header { position: relative; z-index: 1; display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 38px; }
+.tool-tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: 1px solid rgba(255,255,255,.14); border-radius: 13px; background: rgba(8,34,23,.32); }
+.tab-btn { padding: 10px 13px; border: 0; border-radius: 9px; background: transparent; color: rgba(255,255,255,.68); font-size: 12px; font-weight: 600; cursor: pointer; transition: background .2s, color .2s; white-space: nowrap; }
+.tab-btn.active { background: var(--lime); color: var(--forest-deep); box-shadow: 0 3px 9px rgba(0,0,0,.12); }
+.tab-btn:hover:not(.active) { color: var(--white); }
+.tool-panel { display: none; position: relative; z-index: 1; }
+.tool-panel.active { display: block; animation: panel-in .3s ease both; }
+@keyframes panel-in { from { opacity: .2; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.tool-frame { overflow: hidden; border: 1px solid rgba(255,255,255,.29); border-radius: 20px; background: var(--paper); box-shadow: 0 25px 55px rgba(5,24,16,.26); }
+.tool-topbar { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 12px 18px; border-bottom: 1px solid var(--line); background: #f4f2eb; }
+.tool-dots { display: flex; gap: 5px; }
+.tool-dot { width: 8px; height: 8px; border-radius: 50%; }
+.tool-body { padding: 24px; color: var(--text); }
+/* Forms and tables */
+.f-card { padding: 20px; margin-bottom: 20px; border: 1px solid var(--line); border-radius: 14px; background: #fcfcf8; }
+.f-ctitle { margin-bottom: 14px; color: var(--forest); font: 650 12px 'Space Grotesk', sans-serif; letter-spacing: -.01em; }
+.f-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.f-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.f-field { display: flex; flex-direction: column; gap: 6px; }
+.f-field label { color: var(--muted); font-size: 11px; font-weight: 600; }
+.f-field input, .f-field select { width: 100%; min-height: 42px; padding: 10px 11px; border: 1px solid #d6dcd2; border-radius: 9px; outline: 0; background: var(--white); color: var(--text); font-size: 13px; transition: border .2s, box-shadow .2s; }
+.f-field input::placeholder { color: #a9b1a9; }
+.f-field input:focus, .f-field select:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(63,116,88,.11); }
+.f-field select option { color: var(--text); background: white; }
+.f-submit { width: 100%; min-height: 42px; margin-top: 14px; padding: 10px 14px; border: 1px solid var(--forest); border-radius: 9px; background: var(--forest); color: white; font-size: 13px; font-weight: 650; cursor: pointer; transition: background .2s, transform .2s; }
+.f-submit:hover { background: #28513c; transform: translateY(-1px); }
+.f-error { display: none; margin-top: 9px; color: var(--danger); font-size: 12px; }
+.t-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--white); }
+table { width: 100%; min-width: 560px; border-collapse: collapse; }
+thead th { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f5f6f0; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
+tbody td { padding: 13px 14px; border-bottom: 1px solid #edf0e9; color: var(--text); font-size: 13px; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: #fafbf7; }
+td.num, th.num { font-family: 'IBM Plex Mono', monospace; }
+.empty-row td { padding: 32px 14px; color: var(--muted-2); font-style: italic; text-align: center; }
+.del-btn { padding: 6px 9px; border: 1px solid #ead5cf; border-radius: 7px; background: #fffafa; color: var(--danger); font-size: 11px; font-weight: 600; cursor: pointer; }
+.del-btn:hover { background: #fff0ed; }
+.stamp { display: inline-flex; padding: 4px 8px; border-radius: 99px; font: 650 9px/1 'IBM Plex Mono', monospace; letter-spacing: .04em; text-transform: uppercase; }
+.stamp.growing { border: 1px solid #b6d5ba; background: #eff8eb; color: #347145; }
+.stamp.harvested { border: 1px solid #ead497; background: #fff8de; color: #86691b; }
+/* Report */
+.cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px; }
+.stat-card { padding: 17px; border: 1px solid var(--line); border-radius: 13px; background: #fcfcf8; }
+.stat-card .label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.stat-card .value { margin-top: 7px; color: var(--forest); font: 650 27px/1 'Space Grotesk', sans-serif; letter-spacing: -.055em; }
+.ledger { padding: 19px 21px; border: 1px solid var(--line); border-radius: 14px; background: #fcfcf8; }
+.l-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px dashed #d9ded6; color: var(--muted); font-size: 13px; }
+.l-row .amt { color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+.l-row.total { margin-top: 5px; padding-top: 14px; border-top: 1px solid var(--line); border-bottom: 0; color: var(--forest); font-size: 15px; font-weight: 700; }
+.l-row.total.profit .amt { color: var(--leaf); }
+.l-row.total.loss .amt { color: var(--danger); }
+.bar-wrap { margin-top: 19px; }
+.bar-label { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--muted); font: 10px 'IBM Plex Mono', monospace; }
+.bar-track { height: 8px; margin-bottom: 13px; overflow: hidden; border-radius: 99px; background: #e8ede6; }
+.bar-fill { height: 100%; border-radius: inherit; transition: width .4s ease; }
+.bar-fill.revenue { background: var(--leaf); }
+.bar-fill.cost { background: var(--clay); }
+/* Process */
+#how { background: #e9efe4; }
+.how-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 49px; }
+.how-step { min-height: 216px; padding: 25px; border: 1px solid rgba(46,84,57,.12); border-radius: 16px; background: rgba(255,255,255,.54); transition: transform .2s; }
+.how-step:hover { transform: translateY(-4px); }
+.how-num { color: var(--leaf); font: 650 13px 'IBM Plex Mono', monospace; }
+.how-num::after { content: ''; display: block; width: 26px; height: 2px; margin-top: 17px; background: var(--sun); }
+.how-title { margin-top: 21px; color: var(--forest); font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 650; letter-spacing: -.03em; }
+.how-desc { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.65; }
+/* Trust */
+#about { background: var(--paper); }
+.about-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 15px; margin-top: 49px; }
+.about-card { min-height: 163px; padding: 23px; border: 1px solid var(--line); border-radius: 15px; background: white; transition: transform .2s, box-shadow .2s; }
+.about-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-3px); }
+.about-tag { color: var(--leaf); font: 650 9px 'IBM Plex Mono', monospace; letter-spacing: .11em; }
+.about-title { margin-top: 14px; color: var(--forest); font: 650 16px 'Space Grotesk', sans-serif; letter-spacing: -.03em; }
+.about-desc { margin-top: 5px; color: var(--muted); font-size: 12.5px; line-height: 1.65; }
+/* CTA */
+#cta { padding-top: 0; padding-bottom: 0; background: var(--paper); }
+.cta-inner { position: relative; overflow: hidden; max-width: 1220px; margin: 0 auto; padding: 77px 30px; border-radius: 24px; background: var(--forest); color: white; text-align: center; }
+.cta-inner::before, .cta-inner::after { content: ''; position: absolute; border: 1px solid rgba(217,235,153,.22); border-radius: 50%; }
+.cta-inner::before { width: 400px; height: 400px; left: -230px; top: -270px; }
+.cta-inner::after { width: 330px; height: 330px; right: -205px; bottom: -250px; }
+.cta-inner > * { position: relative; z-index: 1; }
+.cta-inner .section-label { color: var(--lime); }
+.cta-inner .section-title { max-width: 650px; margin: 0 auto; color: white; font-size: clamp(34px, 4vw, 53px); }
+.cta-inner .section-sub { margin: 17px auto 31px; color: rgba(255,255,255,.71); }
+.cta-inner .btn-gold { border-color: var(--lime); background: var(--lime); color: var(--forest-deep); }
+.cta-inner .btn-gold:hover { background: #e1eea4; }
+.cta-inner .btn-outline { border-color: rgba(255,255,255,.27); background: transparent; color: white; }
+.cta-inner .btn-outline:hover { border-color: rgba(255,255,255,.65); background: rgba(255,255,255,.08); }
+/* Footer */
+footer { padding: 74px max(5%, calc((100vw - 1220px) / 2)) 30px; background: var(--paper); }
+.footer-grid { display: grid; grid-template-columns: 2.2fr 1fr 1fr; gap: 50px; padding-bottom: 47px; }
+.footer-brand p { max-width: 340px; margin-top: 14px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.footer-col h4 { margin-bottom: 13px; color: var(--forest); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; }
+.footer-col a { display: block; margin: 8px 0; color: var(--muted); font-size: 13px; text-decoration: none; }
+.footer-col a:hover { color: var(--leaf); }
+.footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 21px; border-top: 1px solid var(--line); color: var(--muted-2); font-size: 11px; }
+.footer-legal a { color: var(--leaf); text-decoration: none; font-weight: 600; }
+/* Animation */
+@keyframes fadeup { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+.fadeup { animation: fadeup .65s both cubic-bezier(.2,.65,.3,1); }
+.d1 { animation-delay: .07s; } .d2 { animation-delay: .15s; } .d3 { animation-delay: .22s; } .d4 { animation-delay: .29s; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
+@media (max-width: 880px) {
+  section { padding-top: 82px; padding-bottom: 82px; }
+  .hero { min-height: auto; grid-template-columns: 1fr; padding-top: 126px; padding-bottom: 68px; gap: 45px; }
+  .hero-copy { max-width: 660px; }
+  .hero-visual { min-height: 410px; }
+  .hero-stats { grid-column: 1; }
+  .features-grid, .about-grid { grid-template-columns: repeat(2,1fr); }
+  .how-grid { grid-template-columns: repeat(2,1fr); }
+  .footer-grid { grid-template-columns: 1.5fr 1fr 1fr; gap: 25px; }
+}
+@media (max-width: 650px) {
+  nav { height: 68px; padding: 0 5%; }
+  .nav-logo { font-size: 19px; }
+  .nav-badge, .nav-cta { display: none; }
+  .menu-toggle { display: block; }
+  .nav-links { position: fixed; top: 68px; left: 0; right: 0; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: 12px 5% 20px; border-bottom: 1px solid var(--line); background: var(--paper); box-shadow: 0 14px 20px rgba(20,50,33,.08); }
+  .nav-links.is-open { display: flex; }
+  .nav-links a { padding: 14px 3px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .hero { gap: 25px; padding-top: 110px; }
+  .hero h1 { font-size: clamp(44px, 12vw, 58px); }
+  .hero-sub { font-size: 15px; }
+  .hero-visual { min-height: 360px; transform: scale(.92); margin: -18px -20px; }
+  .leaf-orbit { width: 360px; height: 360px; }
+  .dashboard-card { padding: 17px; }
+  .season-card { min-height: 138px; }
+  .season-card strong { font-size: 24px; }
+  .hero-stats { grid-template-columns: repeat(2,1fr); }
+  .hero-stats > div:nth-child(2) { border-right: 0; }
+  .hero-stats > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .features-intro { grid-template-columns: 1fr; }
+  .features-grid, .about-grid, .how-grid { grid-template-columns: 1fr; }
+  .feat-card { min-height: 0; }
+  .tools-header { align-items: flex-start; flex-direction: column; }
+  .tool-tabs { width: 100%; overflow-x: auto; flex-wrap: nowrap; }
+  .tab-btn { padding: 9px 10px; font-size: 11px; }
+  .tool-topbar { padding: 11px 13px; }
+  .tool-topbar span:nth-child(2) { max-width: 185px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tool-body { padding: 14px; }
+  .f-grid2, .f-grid4, .cards { grid-template-columns: 1fr; }
+  .ledger { padding: 15px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-bottom { align-items: flex-start; flex-direction: column; }
+  .cta-inner { padding: 58px 22px; }
+}
+
+</style>
+</head>
+
+<body>
+<nav aria-label="Main navigation">
+  <a class="nav-logo" href="#top"><span>Farm</span>Ledger <span class="nav-badge">LOCAL</span></a>
+  <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="nav-links">
+    <a href="#features">Why FarmLedger</a><a href="#tools">Your ledger</a><a href="#how">How it works</a><a href="#about">Built simple</a>
+  </div>
+  <a class="nav-cta" href="#tools">Open ledger <span>→</span></a>
+</nav>
+
+<section class="hero" id="top">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-copy">
+    <div class="hero-eyebrow fadeup"><span class="eyebrow-line"></span>Made for the season ahead</div>
+    <h1 class="fadeup d1">A clearer season <em>starts</em> with one good ledger.</h1>
+    <p class="hero-sub fadeup d2">Keep crops, costs, harvests, and profit in one calm, simple place — so you can spend less time sorting paper and more time growing.</p>
+    <div class="hero-btns fadeup d3"><a class="btn-gold" href="#tools">Start your ledger</a><a class="btn-outline" href="#how">See how it works</a></div>
+  </div>
+  <div class="hero-visual fadeup d2" aria-label="FarmLedger dashboard preview">
+    <div class="leaf-orbit" aria-hidden="true"></div>
+    <div class="dashboard-card">
+      <div class="dashboard-head"><div class="dashboard-brand"><i>✦</i> Season overview</div><span class="live-pill">Saved</span></div>
+      <div class="season-card"><div><span class="season-label">Your farm, in focus</span><strong>Every record, ready when you are.</strong></div><span class="season-value">LOCAL FIRST</span></div>
+      <div class="visual-metrics"><div class="visual-metric"><span>Crop records</span><strong>Easy</strong></div><div class="visual-metric"><span>Costs</span><strong>Clear</strong></div><div class="visual-metric"><span>Reports</span><strong>Live</strong></div></div>
+      <div class="visual-note"><b>✓</b> Everything is stored safely in your browser.</div>
+    </div>
+  </div>
+  <div class="hero-stats fadeup d4">
+    <div><div class="stat-num">4</div><div class="stat-label">Simple record modules</div></div><div><div class="stat-num">100%</div><div class="stat-label">Saved automatically</div></div><div><div class="stat-num">0</div><div class="stat-label">Accounts to create</div></div><div><div class="stat-num">₹</div><div class="stat-label">Profit &amp; loss, live</div></div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="features-intro"><div><div class="section-label">Everything in one place</div><h2 class="section-title">A simpler way to run your farm.</h2></div><p class="feature-kicker">From planting to sale day, FarmLedger helps each season stay clear, current, and easy to act on.</p></div>
+  <div class="features-grid">
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 20V10M12 14c-4.5 0-7-2.5-7-7 4.5 0 7 2.5 7 7ZM12 11c0-4 2.4-6 7-7 0 4.5-2.5 7-7 7Z"/></svg></div><h3 class="feat-name">Crop records</h3><p class="feat-desc">Keep every crop, field, area, and cost together from planting through harvest.</p></article>
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v10M15 9.5c-.55-.5-1.5-.8-2.5-.8-1.4 0-2.5.8-2.5 2s1.1 2 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-1.95-.3-2.5-.8"/></svg></div><h3 class="feat-name">Expense tracking</h3><p class="feat-desc">Log fertiliser, labour, equipment, and every small cost while it is still fresh.</p></article>
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M4 17.5 9 12l3 3 7-8"/><path d="M15 7h4v4"/><path d="M4 20h16"/></svg></div><h3 class="feat-name">Harvest &amp; revenue</h3><p class="feat-desc">Enter quantity and rate once. Revenue is calculated instantly, without a calculator.</p></article>
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></div><h3 class="feat-name">Live season report</h3><p class="feat-desc">Watch revenue, cost, and net result come together in a single, readable view.</p></article>
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M6 12.5 10 16l8-9"/><path d="M21 12a9 9 0 1 1-4-7.5"/></svg></div><h3 class="feat-name">Status at a glance</h3><p class="feat-desc">Know which crops are growing and which have been harvested—without double counting.</p></article>
+    <article class="feat-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2Z"/><path d="M8 4v6h7V4M8 20v-6h8v6"/></svg></div><h3 class="feat-name">Always saved</h3><p class="feat-desc">Your records live in your browser and are saved the moment you make a change.</p></article>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="tools-header"><div><div class="section-label">Your workspace</div><h2 class="section-title">Keep the season moving.</h2></div><div class="tool-tabs" role="tablist" aria-label="Ledger sections"><button class="tab-btn active" type="button" data-tab="report" role="tab" aria-selected="true" onclick="switchTab('report', this)">Overview</button><button class="tab-btn" type="button" data-tab="crops" role="tab" aria-selected="false" onclick="switchTab('crops', this)">Crops</button><button class="tab-btn" type="button" data-tab="expenses" role="tab" aria-selected="false" onclick="switchTab('expenses', this)">Expenses</button><button class="tab-btn" type="button" data-tab="harvests" role="tab" aria-selected="false" onclick="switchTab('harvests', this)">Harvests</button></div></div>
+  <div class="tool-panel active" id="panel-report" role="tabpanel"><div class="tool-frame"><div class="tool-topbar"><div class="tool-dots"><div class="tool-dot" style="background:#dc7960"></div><div class="tool-dot" style="background:#e9c45e"></div><div class="tool-dot" style="background:#65a678"></div></div><span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace">FARMLEDGER / SEASON OVERVIEW</span><span style="font-size:10px;color:var(--leaf);font-weight:650">● saved locally</span></div><div class="tool-body"><div class="cards"><div class="stat-card"><div class="label">Total crops</div><div class="value" id="stat-crops">0</div></div><div class="stat-card"><div class="label">Total harvests</div><div class="value" id="stat-harvests">0</div></div><div class="stat-card"><div class="label">Total expenses</div><div class="value" id="stat-expenses">0</div></div></div><div class="ledger"><div class="l-row"><span>Total revenue</span><span class="amt" id="sum-revenue">₹0.00</span></div><div class="l-row"><span>Crop cost</span><span class="amt" id="sum-cropcost">₹0.00</span></div><div class="l-row"><span>Other expenses</span><span class="amt" id="sum-otherexp">₹0.00</span></div><div class="l-row"><span>Total cost</span><span class="amt" id="sum-totalcost">₹0.00</span></div><div class="l-row total" id="sum-profit-row"><span id="sum-profit-label">Net profit</span><span class="amt" id="sum-profit">₹0.00</span></div><div class="bar-wrap"><div class="bar-label"><span>Revenue</span><span id="bar-rev-label">₹0.00</span></div><div class="bar-track"><div class="bar-fill revenue" id="bar-rev" style="width:0%"></div></div><div class="bar-label"><span>Total cost</span><span id="bar-cost-label">₹0.00</span></div><div class="bar-track"><div class="bar-fill cost" id="bar-cost" style="width:0%"></div></div></div></div></div></div></div>
+  <div class="tool-panel" id="panel-crops" role="tabpanel"><div class="tool-frame"><div class="tool-topbar"><div class="tool-dots"><div class="tool-dot" style="background:#dc7960"></div><div class="tool-dot" style="background:#e9c45e"></div><div class="tool-dot" style="background:#65a678"></div></div><span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace">FARMLEDGER / CROP RECORDS</span><span style="font-size:10px;color:var(--leaf);font-weight:650">● saved locally</span></div><div class="tool-body"><div class="f-card"><div class="f-ctitle">Add a crop</div><form id="cropForm"><div class="f-grid4"><div class="f-field"><label for="cropName">Crop name</label><input id="cropName" required maxlength="19" placeholder="e.g. Wheat" /></div><div class="f-field"><label for="cropFieldInput">Field</label><input id="cropFieldInput" required maxlength="19" placeholder="e.g. North Field" /></div><div class="f-field"><label for="cropArea">Area (acres)</label><input id="cropArea" type="number" min="0.01" step="0.01" required placeholder="0.0" /></div><div class="f-field"><label for="cropCost">Cost (₹)</label><input id="cropCost" type="number" min="0" step="0.01" required placeholder="0.00" /></div></div><button type="submit" class="f-submit">Add crop</button><div class="f-error" id="cropError">Please fill every field with a valid, positive value.</div></form></div><div class="t-wrap"><table><thead><tr><th>Name</th><th>Field</th><th class="num">Area</th><th class="num">Cost</th><th>Status</th><th></th></tr></thead><tbody id="cropTableBody"></tbody></table></div></div></div></div>
+  <div class="tool-panel" id="panel-expenses" role="tabpanel"><div class="tool-frame"><div class="tool-topbar"><div class="tool-dots"><div class="tool-dot" style="background:#dc7960"></div><div class="tool-dot" style="background:#e9c45e"></div><div class="tool-dot" style="background:#65a678"></div></div><span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace">FARMLEDGER / EXPENSES</span><span style="font-size:10px;color:var(--leaf);font-weight:650">● saved locally</span></div><div class="tool-body"><div class="f-card"><div class="f-ctitle">Add an expense</div><form id="expenseForm"><div class="f-grid2"><div class="f-field"><label for="expName">Expense name</label><input id="expName" required maxlength="19" placeholder="e.g. Fertilizer" /></div><div class="f-field"><label for="expAmount">Amount (₹)</label><input id="expAmount" type="number" min="0.01" step="0.01" required placeholder="0.00" /></div></div><button type="submit" class="f-submit">Add expense</button><div class="f-error" id="expError">Please fill every field with a valid, positive value.</div></form></div><div class="t-wrap"><table><thead><tr><th>Name</th><th class="num">Amount</th><th></th></tr></thead><tbody id="expTableBody"></tbody></table></div></div></div></div>
+  <div class="tool-panel" id="panel-harvests" role="tabpanel"><div class="tool-frame"><div class="tool-topbar"><div class="tool-dots"><div class="tool-dot" style="background:#dc7960"></div><div class="tool-dot" style="background:#e9c45e"></div><div class="tool-dot" style="background:#65a678"></div></div><span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace">FARMLEDGER / HARVESTS</span><span style="font-size:10px;color:var(--leaf);font-weight:650">● saved locally</span></div><div class="tool-body"><div class="f-card"><div class="f-ctitle">Record a harvest</div><form id="harvestForm"><div class="f-grid4"><div class="f-field"><label for="harCrop">Crop</label><select id="harCrop" required></select></div><div class="f-field"><label for="harQty">Quantity</label><input id="harQty" type="number" min="0.01" step="0.01" required placeholder="0.0" /></div><div class="f-field"><label for="harRate">Rate (₹ / unit)</label><input id="harRate" type="number" min="0.01" step="0.01" required placeholder="0.00" /></div><div style="display:flex;align-items:flex-end"><button type="submit" class="f-submit" style="margin-top:0">Record harvest</button></div></div><div class="f-error" id="harError">Select a crop and enter valid, positive values.</div></form></div><div class="t-wrap"><table><thead><tr><th>Crop</th><th class="num">Quantity</th><th class="num">Rate</th><th class="num">Revenue</th><th></th></tr></thead><tbody id="harTableBody"></tbody></table></div></div></div></div>
+</section>
+
+<section id="how"><div class="section-label">A useful rhythm</div><h2 class="section-title">Four small steps. One clear picture.</h2><div class="how-grid"><article class="how-step"><div class="how-num">01</div><h3 class="how-title">Add a crop</h3><p class="how-desc">Log the field, area, and cost when you plant. It begins as growing.</p></article><article class="how-step"><div class="how-num">02</div><h3 class="how-title">Capture costs</h3><p class="how-desc">Save labour, fertiliser, and other expenses as your season moves.</p></article><article class="how-step"><div class="how-num">03</div><h3 class="how-title">Record harvest</h3><p class="how-desc">Add quantity and sale rate. FarmLedger works out revenue for you.</p></article><article class="how-step"><div class="how-num">04</div><h3 class="how-title">See the season</h3><p class="how-desc">Read the live profit-and-loss picture any time you need it.</p></article></div></section>
+
+<section id="about"><div class="section-label">Made to stay out of your way</div><h2 class="section-title">The best tools feel effortless.</h2><p class="section-sub">No complicated setup. No accounts. Just the essentials for a more organised farm.</p><div class="about-grid"><article class="about-card"><div class="about-tag">NO LOGIN</div><h3 class="about-title">Open and start</h3><p class="about-desc">There is nothing to sign up for. Add your first record right away.</p></article><article class="about-card"><div class="about-tag">LOCAL FIRST</div><h3 class="about-title">Your data stays with you</h3><p class="about-desc">Records are saved in your own browser, not sent off to a server.</p></article><article class="about-card"><div class="about-tag">AUTOMATIC</div><h3 class="about-title">Always saved</h3><p class="about-desc">Close the page, return later, and your records will be right where you left them.</p></article><article class="about-card"><div class="about-tag">ANY DEVICE</div><h3 class="about-title">Designed for field or desk</h3><p class="about-desc">A responsive layout keeps your ledger easy to read on every screen.</p></article><article class="about-card"><div class="about-tag">UNLIMITED</div><h3 class="about-title">No record limits</h3><p class="about-desc">Track every crop, every expense, and every harvest across the season.</p></article><article class="about-card"><div class="about-tag">CLEAR BY DESIGN</div><h3 class="about-title">The maths is handled</h3><p class="about-desc">Revenue, costs, and net result update the moment a record changes.</p></article></div></section>
+
+<section id="cta"><div class="cta-inner"><div class="section-label">Ready when you are</div><h2 class="section-title">Give this season a clearer story.</h2><p class="section-sub">Open the ledger, add your first crop, and let the record keep itself.</p><div class="hero-btns" style="justify-content:center"><a class="btn-gold" href="#tools">Open your ledger</a><a class="btn-outline" href="#features">Explore features</a></div></div></section>
+
+<footer><div class="footer-grid"><div class="footer-brand"><a class="nav-logo" href="#top"><span>Farm</span>Ledger</a><p>A simple, always-saved record system for crops, expenses, harvests, and profit — built for the farm, not a server room.</p></div><div class="footer-col"><h4>Ledger</h4><a href="#tools">Season overview</a><a href="#tools">Crop records</a><a href="#tools">Expenses</a><a href="#tools">Harvests</a></div><div class="footer-col"><h4>Learn</h4><a href="#features">Why FarmLedger</a><a href="#how">How it works</a><a href="#about">Built simple</a></div></div><div class="footer-bottom"><span>© 2026 FarmLedger. Agricultural Farm Record Management System.</span><div class="footer-legal"><a href="#about">Your data stays in your browser</a></div></div></footer>
+
+<script>
+
+/* ── TAB SWITCHER ── */
+function switchTab(t, button){
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  document.getElementById('panel-'+t).classList.add('active');
+  const activeButton = button || document.querySelector(`[data-tab="${t}"]`);
+  if(activeButton){ activeButton.classList.add('active'); activeButton.setAttribute('aria-selected','true'); }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const menuButton = document.querySelector('.menu-toggle');
+  const navLinks = document.querySelector('.nav-links');
+  if(menuButton && navLinks){
+    menuButton.addEventListener('click', () => {
+      const expanded = menuButton.getAttribute('aria-expanded') === 'true';
+      menuButton.setAttribute('aria-expanded', String(!expanded));
+      navLinks.classList.toggle('is-open', !expanded);
+      document.body.classList.toggle('menu-open', !expanded);
+    });
+    navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navLinks.classList.remove('is-open'); document.body.classList.remove('menu-open'); menuButton.setAttribute('aria-expanded','false');
+    }));
+  }
+});
+
+/* ══════════════════════════════════════
+   FARM DATA — saved to localStorage
+══════════════════════════════════════ */
+(function(){
+  const STORAGE_KEY = "farmLedgerData_v2";
+
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { crops:[], expenses:[], harvests:[], nextId:1 };
+      const p = JSON.parse(raw);
+      return { crops:p.crops||[], expenses:p.expenses||[], harvests:p.harvests||[], nextId:p.nextId||1 };
+    }catch(e){ console.error("Could not read saved data.", e); return { crops:[], expenses:[], harvests:[], nextId:1 }; }
+  }
+  function saveData(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch(e){ console.error("Could not save data.", e); alert("Your changes could not be saved (browser storage may be full or disabled)."); }
+  }
+  let data = loadData();
+
+  function fmt(n){ return "₹" + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+  function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  function renderCrops(){
+    const tbody = document.getElementById('cropTableBody');
+    if(data.crops.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No crops recorded yet — add your first one above.</td></tr>';
+    }else{
+      tbody.innerHTML = data.crops.map(c => `
+        <tr>
+          <td>${esc(c.name)}</td><td>${esc(c.field)}</td>
+          <td class="num">${c.area.toFixed(1)}</td><td class="num">${fmt(c.cost)}</td>
+          <td><span class="stamp ${c.status==='Harvested'?'harvested':'growing'}">${c.status}</span></td>
+          <td><button class="del-btn" data-id="${c.id}">Delete</button></td>
+        </tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      const id = Number(b.dataset.id);
+      const crop = data.crops.find(c=>c.id===id);
+      if(crop && crop.status==='Harvested'){
+        if(!confirm("This crop has a linked harvest record. Deleting it will also remove that harvest. Continue?")) return;
+        data.harvests = data.harvests.filter(h=>h.cropId!==id);
+      }
+      data.crops = data.crops.filter(c=>c.id!==id);
+      saveData(); renderAll();
+    }));
+  }
+
+  function renderExpenses(){
+    const tbody = document.getElementById('expTableBody');
+    if(data.expenses.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="3">No expenses recorded yet — add your first one above.</td></tr>';
+    }else{
+      tbody.innerHTML = data.expenses.map(e => `
+        <tr><td>${esc(e.name)}</td><td class="num">${fmt(e.amount)}</td>
+        <td><button class="del-btn" data-id="${e.id}">Delete</button></td></tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      data.expenses = data.expenses.filter(e=>e.id!==Number(b.dataset.id));
+      saveData(); renderAll();
+    }));
+  }
+
+  function renderHarvestCropOptions(){
+    const sel = document.getElementById('harCrop');
+    const growing = data.crops.filter(c=>c.status!=='Harvested');
+    if(growing.length === 0){
+      sel.innerHTML = '<option value="">No growing crops available</option>';
+      sel.disabled = true;
+    }else{
+      sel.disabled = false;
+      sel.innerHTML = growing.map(c=>`<option value="${c.id}">${esc(c.name)} — ${esc(c.field)}</option>`).join('');
+    }
+  }
+  function renderHarvests(){
+    const tbody = document.getElementById('harTableBody');
+    if(data.harvests.length === 0){
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No harvests recorded yet.</td></tr>';
+    }else{
+      tbody.innerHTML = data.harvests.map(h => `
+        <tr><td>${esc(h.cropName)}</td><td class="num">${h.qty.toFixed(1)}</td>
+        <td class="num">${fmt(h.rate)}</td><td class="num">${fmt(h.revenue)}</td>
+        <td><button class="del-btn" data-id="${h.id}">Delete</button></td></tr>`).join('');
+    }
+    tbody.querySelectorAll('.del-btn').forEach(b=>b.addEventListener('click', ()=>{
+      const id = Number(b.dataset.id);
+      const h = data.harvests.find(x=>x.id===id);
+      if(h){ const crop = data.crops.find(c=>c.id===h.cropId); if(crop) crop.status='Growing'; }
+      data.harvests = data.harvests.filter(x=>x.id!==id);
+      saveData(); renderAll();
+    }));
+    renderHarvestCropOptions();
+  }
+
+  function renderReport(){
+    document.getElementById('stat-crops').textContent = data.crops.length;
+    document.getElementById('stat-harvests').textContent = data.harvests.length;
+    document.getElementById('stat-expenses').textContent = data.expenses.length;
+    const revenue = data.harvests.reduce((s,h)=>s+h.revenue,0);
+    const cropCost = data.crops.reduce((s,c)=>s+c.cost,0);
+    const otherExp = data.expenses.reduce((s,e)=>s+e.amount,0);
+    const totalCost = cropCost + otherExp;
+    const profit = revenue - totalCost;
+    document.getElementById('sum-revenue').textContent = fmt(revenue);
+    document.getElementById('sum-cropcost').textContent = fmt(cropCost);
+    document.getElementById('sum-otherexp').textContent = fmt(otherExp);
+    document.getElementById('sum-totalcost').textContent = fmt(totalCost);
+    const row = document.getElementById('sum-profit-row');
+    const label = document.getElementById('sum-profit-label');
+    const val = document.getElementById('sum-profit');
+    row.classList.remove('profit','loss');
+    if(profit >= 0){ row.classList.add('profit'); label.textContent='Net profit'; val.textContent=fmt(profit); }
+    else { row.classList.add('loss'); label.textContent='Net loss'; val.textContent=fmt(Math.abs(profit)); }
+    const maxVal = Math.max(revenue, totalCost, 1);
+    document.getElementById('bar-rev').style.width = (revenue/maxVal*100)+'%';
+    document.getElementById('bar-cost').style.width = (totalCost/maxVal*100)+'%';
+    document.getElementById('bar-rev-label').textContent = fmt(revenue);
+    document.getElementById('bar-cost-label').textContent = fmt(totalCost);
+  }
+
+  function renderAll(){ renderCrops(); renderExpenses(); renderHarvests(); renderReport(); }
+
+  document.getElementById('cropForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('cropName').value.trim();
+    const field = document.getElementById('cropFieldInput').value.trim();
+    const area = parseFloat(document.getElementById('cropArea').value);
+    const cost = parseFloat(document.getElementById('cropCost').value);
+    const err = document.getElementById('cropError');
+    if(!name || !field || !(area>0) || !(cost>=0) || isNaN(area) || isNaN(cost)){ err.style.display='block'; return; }
+    err.style.display='none';
+    data.crops.push({ id:data.nextId++, name, field, area, cost, status:'Growing' });
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  document.getElementById('expenseForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('expName').value.trim();
+    const amount = parseFloat(document.getElementById('expAmount').value);
+    const err = document.getElementById('expError');
+    if(!name || !(amount>0) || isNaN(amount)){ err.style.display='block'; return; }
+    err.style.display='none';
+    data.expenses.push({ id:data.nextId++, name, amount });
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  document.getElementById('harvestForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const cropId = Number(document.getElementById('harCrop').value);
+    const qty = parseFloat(document.getElementById('harQty').value);
+    const rate = parseFloat(document.getElementById('harRate').value);
+    const err = document.getElementById('harError');
+    const crop = data.crops.find(c=>c.id===cropId);
+    if(!crop || !(qty>0) || !(rate>0) || isNaN(qty) || isNaN(rate)){ err.style.display='block'; return; }
+    err.style.display='none';
+    const revenue = qty*rate;
+    data.harvests.push({ id:data.nextId++, cropId:crop.id, cropName:crop.name, qty, rate, revenue });
+    crop.status = 'Harvested';
+    saveData(); e.target.reset(); renderAll();
+  });
+
+  renderAll();
+})();
+
+</script>
+</body>
+</html>
